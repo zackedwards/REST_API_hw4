@@ -1,8 +1,7 @@
 const express = require('express')
 const app = express()
-const uid =require('uid')
 const port = 3000
-
+const uidNum = require('uid')
 let objs = {}
 
 // express configuration
@@ -17,22 +16,19 @@ app.post('/', function (req, res) {
 });
 
 app.post('/share', (req, res) => {
-    let id = uid(16);
-    console.log(id);
-    objs[id] = req.body;
-//    console.log(`This is body: ${req.body}`);
-    res.send({success:true, link: `http://localhost:3000/${id}`});
-});
+    let id = uidNum(4)
+    objs[id] = req.body
+    res.send({sucess: true, link: "http://localhost:3000/" + id});
+})
 
-app.get('/:id', (req, res) =>{
-    if (req.params.id && objs[req.params.id]){
-        var data = objs[req.params.id];
+app.get('/:id', (req, res) => {
+    if (objs[req.params.id] != null) {
+        res.send(objs[req.params.id])
         delete objs[req.params.id]
-        res.send(data);
-    } else {
-        res.status(404).send({success: false, error: 404, message: "Not Found!" })
     }
-});
-
+    else{
+        res.send({sucess: false, error: 404, message: "Not Found"})
+    }
+})
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))

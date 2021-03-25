@@ -6,7 +6,7 @@ var urlRoot = "https://api.github.com";
 // NCSU Enterprise endpoint:
 //var urlRoot = "https://api.github.ncsu.edu";
 
-var userId = "zackedwards";
+var userId = "ShinyShips";
 var config = {};
 // Retrieve our api token from the environment variables.
 config.token = process.env.GITHUBTOKEN;
@@ -21,14 +21,15 @@ if( !config.token )
 
 console.log(chalk.green(`Your token is: ${config.token.substring(0,4)}...`));
 
+
 if (process.env.NODE_ENV != 'test')
 {
 	(async () => {
-		await listAuthenicatedUserRepos();
-		await listBranches(userId, "your repo");
-		await createRepo(userId,newrepo);
-		await createIssue(userId, repo, issue);
-		await enableWikiSupport(userId,repo);
+    await listAuthenicatedUserRepos();
+    await listBranches(userId, "your repo");
+    await createRepo(userId,newrepo);
+    await createIssue(userId, repo, issue);
+    await enableWikiSupport(userId,repo);
 
 	})()
 }
@@ -95,7 +96,7 @@ function listAuthenicatedUserRepos()
 async function listBranches(owner,repo)
 {
 	let options = getDefaultOptions(`/repos/${owner}/${repo}/branches`, "GET");
-	
+
 	// Send a http request to url and specify a callback that will be called upon its return.
 	return new Promise(function(resolve, reject)
 	{
@@ -104,6 +105,7 @@ async function listBranches(owner,repo)
 			var obj = JSON.parse(body);
 			// console.debug( options );
 			resolve(obj);
+
 		});
 	});
 }
@@ -111,8 +113,8 @@ async function listBranches(owner,repo)
 // 2. Write code to create a new repo
 async function createRepo(owner,repo)
 {
-	let options = getDefaultOptions("/", "POST");
-	options.json = {name:repo};
+  let options = getDefaultOptions("/user/repos", "POST");
+  options.json = {name:repo};
 
 	// Send a http request to url and specify a callback that will be called upon its return.
 	return new Promise(function(resolve, reject)
@@ -128,12 +130,11 @@ async function createRepo(owner,repo)
 // 3. Write code for creating an issue for an existing repo.
 async function createIssue(owner,repo, issueName, issueBody)
 {
-	let options = getDefaultOptions("/", "POST");
-	options.json = {
+	let options = getDefaultOptions(`/repos/${owner}/${repo}/issues`, "POST");
+  options.json = {
 		title: issueName,
 		body: issueBody
 	};
-
 	// Send a http request to url and specify a callback that will be called upon its return.
 	return new Promise(function(resolve, reject)
 	{
@@ -148,11 +149,11 @@ async function createIssue(owner,repo, issueName, issueBody)
 // 4. Write code for editing a repo to enable wiki support.
 async function enableWikiSupport(owner,repo)
 {
-	let options = getDefaultOptions("/", "PATCH");
-	options.json =  {
-		"has_wiki": true
-	}
+	let options = getDefaultOptions(`/repos/${owner}/${repo}`, "PATCH");
 
+  options.json =  {
+    "has_wiki": true
+  }
 	// Send a http request to url and specify a callback that will be called upon its return.
 	return new Promise(function(resolve, reject)
 	{
@@ -169,5 +170,3 @@ module.exports.listBranches = listBranches;
 module.exports.createRepo = createRepo;
 module.exports.createIssue = createIssue;
 module.exports.enableWikiSupport = enableWikiSupport;
-
-
